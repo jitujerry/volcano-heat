@@ -1,5 +1,4 @@
-.DS_Store
-Thumbs.db
-*.log
+echo ".DS_Store
 node_modules/
-.env
+*.env
+.env.local" > .gitignore
