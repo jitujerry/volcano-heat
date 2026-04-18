@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product — Volcano Heat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+  <link rel="stylesheet" href="../css/cart.css" />
+  <link rel="stylesheet" href="../css/product.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="../index.html">Volcano <span>Heat</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html#story">Our Story</a></li>
+      <li><a href="../index.html#product">Products</a></li>
+      <li><a href="../index.html#ingredients">Ingredients</a></li>
+      <li><a href="../index.html#reviews">Reviews</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-cta">Login</button>
+    </div>
+  </nav>
+
+  <!-- PRODUCT DETAIL -->
+  <div class="product-detail-wrap" id="product-detail-main">
+    <button class="product-detail-back" onclick="history.back()">Back to Products</button>
+
+    <div class="product-detail-grid" id="product-detail-grid">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- Tabs: Description / Ingredients / Shipping -->
+    <div class="product-tabs" id="product-tabs">
+      <div class="product-tab-buttons">
+        <button class="product-tab-btn active" data-tab="description">Description</button>
+        <button class="product-tab-btn" data-tab="ingredients">Ingredients</button>
+        <button class="product-tab-btn" data-tab="shipping">Shipping</button>
+      </div>
+      <div class="product-tab-panel active" id="tab-description">
+        <p id="tab-desc-text"></p>
+      </div>
+      <div class="product-tab-panel" id="tab-ingredients">
+        <p>Made with: Bhoot Jolokia (Ghost Pepper), Cold-Pressed Mustard Oil, Natural Sea Salt, Panch Phoron (Five-Spice Blend), Fresh Ground Turmeric, Whole Fenugreek Seeds, Lemon Juice. No artificial flavours, colours or preservatives.</p>
+      </div>
+      <div class="product-tab-panel" id="tab-shipping">
+        <p>We ship across India via trusted courier partners. Standard delivery takes 3–7 business days. Free shipping on orders above ₹499. Express delivery available at checkout for select pin codes. All orders are carefully packed to ensure safe delivery.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTHER PRODUCTS -->
+  <div class="related-section">
+    <div class="related-title">You Might Also Like</div>
+    <div class="product-grid" id="related-grid" style="max-width:1100px;margin:0 auto;">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-logo" href="../index.html">Volcano <span style="color:var(--ember)">Heat</span></a>
+        <p>Crafted in Assam. Feared everywhere.</p>
+        <div class="footer-social">
+          <a href="https://instagram.com" target="_blank">📸</a>
+          <a href="https://wa.me/91XXXXXXXXXX" target="_blank">💬</a>
+          <a href="mailto:hello@volcanoheat.in">✉️</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#" onclick="goToProduct('p1');return false;">Original Pickle</a></li>
+          <li><a href="#" onclick="goToProduct('p2');return false;">Double Smoked</a></li>
+          <li><a href="#" onclick="goToProduct('p3');return false;">Garlic Infused</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <ul>
+          <li><a href="shipping.html">Shipping Policy</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="https://instagram.com/volcanoheat" target="_blank">Instagram</a></li>
+          <li><a href="https://wa.me/91XXXXXXXXXX" target="_blank">WhatsApp</a></li>
+          <li><a href="mailto:hello@volcanoheat.in">Email Us</a></li>
+          <li><a href="wholesale.html">Wholesale</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Volcano Heat. All rights reserved. Made with 🔥 in Assam, India</p>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/main.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/reviews.js"></script>
+  <script src="../js/orders.js"></script>
+
+  <script>
+    const PRODUCTS = [
+      {
+        id: 'p1',
+        name: 'Bhoot Jolokia Pickle',
+        variant: 'Original — 100ml',
+        price: 249,
+        heat: 5,
+        img: '../image/mainpic.png',
+        desc: 'The original. Made from hand-picked Bhoot Jolokia from Tezpur, Assam, slow-cooked in cold-pressed mustard oil with traditional Assamese spices. At over 1,000,000 Scoville Heat Units, this is not for the faint-hearted. Every jar is small-batch crafted, with no shortcuts and no artificial additives — just the raw, untamed heat of the Northeast.',
+        features: ['1,000,000+ Scoville Heat Units', 'Hand-picked Ghost Peppers from Tezpur', 'No artificial preservatives or additives', 'Small-batch crafted in Assam', 'Cold-pressed mustard oil base']
+      },
+      {
+        id: 'p2',
+        name: 'Double Smoked',
+        variant: 'Smoked Variant — 100ml',
+        price: 279,
+        heat: 4,
+        img: '../image/doubleSmoked.jpeg',
+        desc: 'Ghost peppers double-smoked over hardwood for a deep, complex flavour layered beneath searing heat. The smoking process intensifies the pepper\'s natural sugars while adding a rich, earthy undertone that complements the fire. Smoky, bold, unrelenting — this is for those who want more than just heat.',
+        features: ['Double-smoked over hardwood', 'Deep smoky flavour profile', 'High heat — 4/5 intensity', 'Small-batch crafted in Assam', 'No artificial preservatives']
+      },
+      {
+        id: 'p3',
+        name: 'Garlic Infused',
+        variant: 'Garlic Variant — 100ml',
+        price: 259,
+        heat: 3,
+        img: '../image/garlicinfused.jpeg',
+        desc: 'Our most versatile variant — whole garlic cloves slow-cooked into the pickle for a rich, aromatic heat that builds slowly and lingers long after the bite. The garlic mellows the initial sharpness while adding depth, making this the perfect everyday pickle for those who love heat with nuance.',
+        features: ['Whole garlic cloves infused', 'Rich aromatic base', 'Medium-high heat — 3/5 intensity', 'Pairs perfectly with rice, roti, meat', 'No artificial preservatives']
+      },
+    ];
+
+    function goToProduct(id) {
+      sessionStorage.setItem('vh_selected_product', id);
+      renderProduct();
+    }
+
+    function renderProduct() {
+      const productId = sessionStorage.getItem('vh_selected_product') || 'p1';
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+
+      document.title = product.name + ' — Volcano Heat';
+
+      let qty = 1;
+
+      const grid = document.getElementById('product-detail-grid');
+      grid.innerHTML = `
+        <div class="product-detail-img-wrap">
+          <img class="product-detail-img" src="${product.img}" alt="${product.name}" />
+        </div>
+        <div class="product-detail-info">
+          <p class="product-detail-tag">Volcano Heat — Assam</p>
+          <h1 class="product-detail-name">${product.name}</h1>
+          <p class="product-detail-variant">${product.variant}</p>
+          <div class="product-detail-heat">
+            ${Array.from({length:5}, (_,i) => `<span class="flame ${i < product.heat ? 'lit' : 'unlit'}">🔥</span>`).join('')}
+            <span style="margin-left:0.5rem;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,239,224,0.4);">${product.heat}/5 heat</span>
+          </div>
+          <p class="product-detail-desc">${product.desc}</p>
+          <div class="product-detail-features">
+            ${product.features.map(f => `<div class="product-detail-feature">${f}</div>`).join('')}
+          </div>
+          <div class="product-detail-price-row">
+            <div>
+              <div class="product-detail-price">₹${product.price}</div>
+              <div class="product-detail-price-note">Net Vol. 100ml · Free shipping above ₹499</div>
+            </div>
+          </div>
+          <div class="product-detail-actions">
+            <div class="product-detail-qty">
+              <button onclick="changeQty(-1)">−</button>
+              <span id="qty-display">1</span>
+              <button onclick="changeQty(1)">+</button>
+            </div>
+            <button class="product-add-btn" onclick="addToCartFromDetail('${product.id}')">Add to Cart</button>
+          </div>
+        </div>
+      `;
+
+      // Tab description
+      document.getElementById('tab-desc-text').textContent = product.desc;
+
+      // Related products (exclude current)
+      const related = PRODUCTS.filter(p => p.id !== productId);
+      const relGrid = document.getElementById('related-grid');
+      relGrid.innerHTML = related.map(p => `
+        <div class="product-card" onclick="goToProduct('${p.id}')">
+          <div class="product-hover-overlay">
+            <div class="hover-title">${p.name}</div>
+            <p class="hover-desc">${p.desc.substring(0,80)}...</p>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem;">
+              <button class="hover-btn" onclick="event.stopPropagation();addToCartFromDetail('${p.id}',1)">Add to Cart</button>
+              <button class="hover-btn ghost" onclick="event.stopPropagation();goToProduct('${p.id}')">View Details</button>
+            </div>
+          </div>
+          <div class="card-img-wrap"><img src="${p.img}" alt="${p.name}" /></div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-weight">${p.variant}</div>
+          <div class="card-heat">${Array.from({length:5},(_,i)=>`<span class="flame ${i<p.heat?'lit':'unlit'}">🔥</span>`).join('')}</div>
+          <div class="card-price">₹${p.price} <span>/ 100ml</span></div>
+          <button class="card-btn" onclick="event.stopPropagation();addToCartFromDetail('${p.id}',1)">Add to Cart</button>
+        </div>
+      `).join('');
+
+      window.changeQty = function(delta) {
+        qty = Math.max(1, qty + delta);
+        document.getElementById('qty-display').textContent = qty;
+      };
+      window.addToCartFromDetail = function(id, forcedQty) {
+        const q = forcedQty || qty;
+        Orders.addToCart(id, q);
+        Orders.openCartDrawer();
+      };
+
+      window.scrollTo(0, 0);
+    }
+
+    // Tab switching
+    document.querySelectorAll('.product-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.product-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.product-tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', renderProduct);
+  </script>
+
+</body>
+</html>

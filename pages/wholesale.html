@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Wholesale — Volcano Heat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/auth.css"/>
+  <link rel="stylesheet" href="../css/cart.css"/>
+  <style>
+    .info-page { padding: 140px 5rem 6rem; max-width: 700px; margin: 0 auto; }
+    .info-page h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--cream); margin-bottom: 0.5rem; }
+    .info-page .tag { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ember); margin-bottom: 1rem; }
+    .info-back { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,239,224,0.4); text-decoration: none; margin-bottom: 3rem; transition: color 0.2s; }
+    .info-back:hover { color: var(--ember); }
+    .ws-field { margin-bottom: 1.2rem; }
+    .ws-field label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,239,224,0.5); margin-bottom: 0.4rem; }
+    .ws-field input, .ws-field select, .ws-field textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(139,26,26,0.3); color: var(--cream); padding: 0.7rem 0.9rem; font-family: 'Barlow', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; resize: vertical; }
+    .ws-field input:focus, .ws-field select:focus, .ws-field textarea:focus { border-color: var(--ember); }
+    .ws-field select option { background: #1a1a1a; }
+    .ws-submit { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; letter-spacing: 0.15em; text-transform: uppercase; background: linear-gradient(135deg,#8B1A1A,#C0392B); color: var(--cream); border: none; padding: 0.9rem 2.5rem; cursor: pointer; transition: opacity 0.2s; }
+    .ws-submit:hover { opacity: 0.88; }
+    @media(max-width:900px){.info-page{padding:100px 1.5rem 4rem;}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">Volcano <span>Heat</span></a>
+    <ul class="nav-links"><li><a href="../index.html#product">Products</a></li></ul>
+    <div class="nav-right"><button class="nav-cta">Login</button></div>
+  </nav>
+  <div class="info-page">
+    <a class="info-back" href="../index.html">← Back to Home</a>
+    <p class="tag">Business</p>
+    <h1>Wholesale Enquiry</h1>
+    <p style="font-size:0.93rem;font-weight:300;line-height:1.8;color:rgba(245,239,224,0.6);margin-bottom:2.5rem;">
+      Interested in stocking Volcano Heat in your restaurant, café, grocery store or gifting brand? We offer competitive wholesale pricing for bulk orders. Fill in the form below and we'll get back to you within 2 business days.
+    </p>
+
+    <div class="ws-field">
+      <label>Business / Restaurant Name</label>
+      <input type="text" id="ws-biz" placeholder="Your business name" />
+    </div>
+    <div class="ws-field">
+      <label>Contact Name</label>
+      <input type="text" id="ws-name" placeholder="Your name" />
+    </div>
+    <div class="ws-field">
+      <label>Email</label>
+      <input type="email" id="ws-email" placeholder="you@business.com" />
+    </div>
+    <div class="ws-field">
+      <label>Phone</label>
+      <input type="tel" id="ws-phone" placeholder="+91 XXXXX XXXXX" />
+    </div>
+    <div class="ws-field">
+      <label>Business Type</label>
+      <select id="ws-type">
+        <option value="">Select...</option>
+        <option>Restaurant / Café</option>
+        <option>Grocery / Supermarket</option>
+        <option>Online Retailer</option>
+        <option>Gift / Hamper Brand</option>
+        <option>Hotel / Resort</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="ws-field">
+      <label>Estimated Monthly Quantity (jars)</label>
+      <select id="ws-qty">
+        <option value="">Select range...</option>
+        <option>50 – 100</option>
+        <option>100 – 300</option>
+        <option>300 – 500</option>
+        <option>500+</option>
+      </select>
+    </div>
+    <div class="ws-field">
+      <label>Additional Notes</label>
+      <textarea id="ws-notes" rows="4" placeholder="Tell us more about your requirements..."></textarea>
+    </div>
+    <p id="ws-error" style="font-size:0.8rem;color:#E85D04;min-height:1.2em;margin-bottom:0.5rem;"></p>
+    <button class="ws-submit" id="ws-submit">Send Enquiry</button>
+  </div>
+
+  <script>
+    document.getElementById('ws-submit').addEventListener('click', () => {
+      const biz = document.getElementById('ws-biz').value.trim();
+      const name = document.getElementById('ws-name').value.trim();
+      const email = document.getElementById('ws-email').value.trim();
+      const err = document.getElementById('ws-error');
+      if (!biz || !name || !email) { err.textContent = 'Please fill in the required fields.'; return; }
+      err.textContent = '';
+      // In production this would POST to a backend
+      document.querySelector('.info-page').innerHTML = `
+        <div style="text-align:center;padding:4rem 0;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🔥</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:#F5EFE0;letter-spacing:0.05em;">Enquiry Received!</div>
+          <p style="font-size:0.9rem;color:rgba(245,239,224,0.5);margin-top:1rem;max-width:40ch;margin:1rem auto;">
+            Thank you, ${name}! We'll review your enquiry and get back to you at ${email} within 2 business days.
+          </p>
+          <a href="../index.html" style="display:inline-block;margin-top:2rem;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:0.15em;text-transform:uppercase;color:#E85D04;text-decoration:none;">← Back to Home</a>
+        </div>
+      `;
+    });
+  </script>
+  <script src="../js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>FAQ — Volcano Heat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/auth.css"/>
+  <link rel="stylesheet" href="../css/cart.css"/>
+  <style>
+    .info-page { padding: 140px 5rem 6rem; max-width: 800px; margin: 0 auto; }
+    .info-page h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--cream); margin-bottom: 0.5rem; }
+    .info-page .tag { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ember); margin-bottom: 1rem; }
+    .info-back { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,239,224,0.4); text-decoration: none; margin-bottom: 3rem; transition: color 0.2s; }
+    .info-back:hover { color: var(--ember); }
+    .faq-item { border-bottom: 1px solid rgba(139,26,26,0.2); padding: 1.5rem 0; }
+    .faq-q { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; letter-spacing: 0.05em; color: var(--cream); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-q::after { content: '+'; color: var(--ember); font-size: 1.5rem; transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+    .faq-a { font-size: 0.9rem; font-weight: 300; line-height: 1.8; color: rgba(245,239,224,0.6); margin-top: 0.75rem; display: none; }
+    .faq-item.open .faq-a { display: block; }
+    @media(max-width:900px){.info-page{padding:100px 1.5rem 4rem;}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">Volcano <span>Heat</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html#product">Products</a></li>
+      <li><a href="../index.html#story">Our Story</a></li>
+    </ul>
+    <div class="nav-right"><button class="nav-cta">Login</button></div>
+  </nav>
+
+  <div class="info-page">
+    <a class="info-back" href="../index.html">← Back to Home</a>
+    <p class="tag">Help</p>
+    <h1>Frequently Asked Questions</h1>
+
+    <div style="margin-top:2.5rem;">
+      <div class="faq-item">
+        <div class="faq-q">How hot is the Bhoot Jolokia Pickle really?</div>
+        <div class="faq-a">The Bhoot Jolokia (Ghost Pepper) measures over 1,000,000 Scoville Heat Units — roughly 400 times hotter than a jalapeño. Our pickle preserves the full heat of the pepper. It is genuinely extreme and not recommended for those with low spice tolerance or any digestive conditions.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are the pickles suitable for vegetarians and vegans?</div>
+        <div class="faq-a">Yes, all Volcano Heat pickles are 100% vegetarian and vegan. They contain no animal products, dairy, or egg derivatives.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the shelf life of the pickle?</div>
+        <div class="faq-a">Unopened jars have a shelf life of 12 months from the date of production. Once opened, store in a cool, dry place and consume within 3 months for best flavour. Refrigeration after opening is recommended.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do you ship all over India?</div>
+        <div class="faq-a">Yes, we ship to all serviceable pin codes across India. Standard delivery takes 3–7 business days. Remote Northeast locations may take up to 10 days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I order in bulk or wholesale?</div>
+        <div class="faq-a">Absolutely! We offer wholesale pricing for restaurants, grocery stores, and bulk orders. Please fill out our wholesale enquiry form or email us at <a href="mailto:wholesale@volcanoheat.in" style="color:var(--ember);">wholesale@volcanoheat.in</a>.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What payment methods are accepted?</div>
+        <div class="faq-a">We accept Cash on Delivery (COD), UPI (Google Pay, PhonePe, Paytm, BHIM), and Net Banking. All transactions are processed securely.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if my order arrives damaged?</div>
+        <div class="faq-a">We take great care in packaging, but if your order arrives damaged, please photograph it and email us at <a href="mailto:hello@volcanoheat.in" style="color:var(--ember);">hello@volcanoheat.in</a> within 48 hours of delivery. We will send a free replacement within 5–7 business days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are your products free of artificial additives?</div>
+        <div class="faq-a">Yes. We use zero artificial flavours, colours, or preservatives. The lemon juice in our recipe acts as a natural preservative. What you get is pure, real, honest pickle.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        q.parentElement.classList.toggle('open');
+      });
+    });
+  </script>
+  <script src="../js/auth.js"></script>
+</body>
+</html>
