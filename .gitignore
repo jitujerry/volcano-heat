@@ -1,6 +1,13 @@
-echo ".DS_Store
-node_modules/
-*.env
-.env.local" > .gitignore
 js/firebase.js
 js/firebase-config.js
+.DS_Store
+node_modules/
+.env
+.env.local
+.firebase/
+firebase-debug.log
+*.log
+*.tmp
+Thumbs.db
+.vscode/
+.idea/
