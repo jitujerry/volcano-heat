@@ -3,6 +3,10 @@
 // session state (localStorage), UI auth toggle
 // ────────────────────────────────────────────────────
 
+import { saveUser } from './firebase.js';
+
+
+
 const Auth = (() => {
 
   // ── State ──────────────────────────────────────────
@@ -139,7 +143,7 @@ const Auth = (() => {
   }
 
   // ── Signup ─────────────────────────────────────────
-  function handleSignup() {
+  async function handleSignup() {
     const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim().toLowerCase();
     const phone = document.getElementById('signup-phone').value.trim();
@@ -165,6 +169,7 @@ const Auth = (() => {
     };
     saveUsers(users);
 
+
     const user = { name, email, phone };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
     currentUser = user;
@@ -173,7 +178,13 @@ const Auth = (() => {
     updateNavForUser(user);
     showToast(`Account created! Welcome, ${name}! 🌶️`);
     if (typeof Reviews !== 'undefined') Reviews.renderReviewForm();
+
+    // inside handleSignup(), after creating the account:
+    await saveUser({ name, email, phone, createdAt: new Date().toISOString() });
   }
+
+  
+
 
   // ── Nav Update ─────────────────────────────────────
   function updateNavForUser(user) {

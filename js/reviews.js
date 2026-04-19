@@ -1,25 +1,15 @@
 // ── REVIEWS.JS ───────────────────────────────────────
-// Real customer reviews only — stored in localStorage
-// Users must be logged in to submit a review
-// ────────────────────────────────────────────────────
+import { saveReview, loadReviews } from './firebase.js';
 
 const Reviews = (() => {
 
-  const REVIEWS_KEY = 'vh_reviews';
-
-  // ── Get / Save Reviews ─────────────────────────────
-  function getReviews() {
-    return JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
-  }
-  function saveReviews(reviews) {
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
-  }
-
-  // ── Render Reviews Grid ────────────────────────────
-  function renderReviews() {
+  // ── Render Reviews Grid — loads from Firebase ──────
+  async function renderReviews() {
     const grid = document.getElementById('reviews-grid');
     if (!grid) return;
-    const reviews = getReviews();
+
+    // Load from Firebase ✅
+    const reviews = await loadReviews();
 
     if (reviews.length === 0) {
       grid.innerHTML = `
@@ -39,16 +29,21 @@ const Reviews = (() => {
       return;
     }
 
-    grid.innerHTML = reviews.map(r => `
-      <div class="review-card">
-        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-        <p class="review-text">"${escapeHtml(r.text)}"</p>
-        <div class="review-author">${escapeHtml(r.author)}</div>
-        <div class="review-location">${escapeHtml(r.location || '')}</div>
-        <div class="review-verified">✓ Verified Customer</div>
-        <div class="review-date">${r.date}</div>
-      </div>
-    `).join('');
+    grid.innerHTML = reviews.map(r => {
+      const date = r.createdAt?.toDate
+        ? r.createdAt.toDate().toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' })
+        : '';
+      return `
+        <div class="review-card">
+          <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+          <p class="review-text">"${escapeHtml(r.text)}"</p>
+          <div class="review-author">${escapeHtml(r.author)}</div>
+          <div class="review-location">${escapeHtml(r.location || '')}</div>
+          <div class="review-verified">✓ Verified Customer</div>
+          <div class="review-date">${date}</div>
+        </div>
+      `;
+    }).join('');
   }
 
   // ── Render Review Form (login-gated) ───────────────
@@ -107,7 +102,7 @@ const Reviews = (() => {
 
         <div class="rform-row">
           <label>Your Review</label>
-          <textarea id="review-text" rows="4" placeholder="Tell others about your experience with this product..."></textarea>
+          <textarea id="review-text" rows="4" placeholder="Tell others about your experience..."></textarea>
         </div>
 
         <p id="review-form-error" style="font-size:0.8rem;color:#E85D04;min-height:1.2em;margin-bottom:0.5rem;"></p>
@@ -138,48 +133,57 @@ const Reviews = (() => {
     document.getElementById('review-submit').addEventListener('click', submitReview);
   }
 
-  // ── Submit Review ──────────────────────────────────
-  function submitReview() {
-    const rating = parseInt(document.getElementById('review-rating').value);
-    const product = document.getElementById('review-product').value;
-    const name = document.getElementById('review-name').value.trim();
+  // ── Submit Review — saves to Firebase ─────────────
+  async function submitReview() {
+    const rating   = parseInt(document.getElementById('review-rating').value);
+    const product  = document.getElementById('review-product').value;
+    const name     = document.getElementById('review-name').value.trim();
     const location = document.getElementById('review-location').value.trim();
-    const text = document.getElementById('review-text').value.trim();
-    const errEl = document.getElementById('review-form-error');
+    const text     = document.getElementById('review-text').value.trim();
+    const errEl    = document.getElementById('review-form-error');
+    const btn      = document.getElementById('review-submit');
 
-    if (rating === 0) { errEl.textContent = 'Please select a rating.'; return; }
-    if (!product) { errEl.textContent = 'Please select a product.'; return; }
-    if (!name) { errEl.textContent = 'Please enter your name.'; return; }
-    if (!text || text.length < 20) { errEl.textContent = 'Please write at least 20 characters in your review.'; return; }
+    if (rating === 0)         { errEl.textContent = 'Please select a rating.'; return; }
+    if (!product)             { errEl.textContent = 'Please select a product.'; return; }
+    if (!name)                { errEl.textContent = 'Please enter your name.'; return; }
+    if (text.length < 20)     { errEl.textContent = 'Please write at least 20 characters.'; return; }
 
-    errEl.textContent = '';
+    errEl.textContent  = '';
+    btn.textContent    = 'Submitting…';
+    btn.disabled       = true;
 
-    const reviews = getReviews();
-    reviews.unshift({
-      id: Date.now(),
-      rating,
-      product,
-      author: name,
-      location,
-      text,
-      date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }),
-    });
-    saveReviews(reviews);
+    try {
+      // Save to Firebase ✅
+      await saveReview({
+        author  : name,
+        product,
+        rating,
+        text,
+        location: location || '',
+        verified: true,
+      });
 
-    renderReviews();
-    renderReviewForm(); // reset form
+      await renderReviews(); // refresh grid from Firebase
+      renderReviewForm();    // reset the form
 
-    if (typeof Auth !== 'undefined') Auth.showToast('Review submitted! Thank you 🔥');
+      if (typeof Auth !== 'undefined') Auth.showToast('Review submitted! Thank you 🔥');
+
+    } catch (e) {
+      errEl.textContent = 'Failed to submit. Please try again.';
+      console.error('Review error:', e);
+    } finally {
+      btn.textContent = 'Submit Review';
+      btn.disabled    = false;
+    }
   }
 
-  // ── Helper ─────────────────────────────────────────
   function escapeHtml(str) {
     return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   // ── Init ───────────────────────────────────────────
-  function init() {
-    renderReviews();
+  async function init() {
+    await renderReviews();
     renderReviewForm();
   }
 
@@ -188,3 +192,4 @@ const Reviews = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', Reviews.init);
+window.Reviews = Reviews;

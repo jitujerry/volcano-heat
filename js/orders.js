@@ -1,13 +1,14 @@
 // ── ORDERS.JS ────────────────────────────────────────
 // Cart, checkout, payment options (COD / UPI / Netbanking)
+// Orders saved to Firebase Firestore
 // ────────────────────────────────────────────────────
+
+import { saveOrder } from './firebase.js';
 
 const Orders = (() => {
 
-  const CART_KEY   = 'vh_cart';
-  const ORDERS_KEY = 'vh_orders';
+  const CART_KEY = 'vh_cart';
 
-  // ── Products Catalogue ─────────────────────────────
   const PRODUCTS = [
     {
       id: 'p1',
@@ -41,26 +42,21 @@ const Orders = (() => {
     },
   ];
 
-  // ── Cart State ─────────────────────────────────────
   let cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
 
-  function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
-  function getCartCount() { return cart.reduce((sum, i) => sum + i.qty, 0); }
-  function getCartTotal() { return cart.reduce((sum, i) => sum + i.price * i.qty, 0); }
-  function getShipping() { return getCartTotal() >= 499 ? 0 : 49; }
+  function saveCart()      { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+  function getCartCount()  { return cart.reduce((sum, i) => sum + i.qty, 0); }
+  function getCartTotal()  { return cart.reduce((sum, i) => sum + i.price * i.qty, 0); }
+  function getShipping()   { return getCartTotal() >= 499 ? 0 : 49; }
   function getGrandTotal() { return getCartTotal() + getShipping(); }
-  function getProduct(id) { return PRODUCTS.find(p => p.id === id); }
+  function getProduct(id)  { return PRODUCTS.find(p => p.id === id); }
 
-  // ── Add / Remove / Update ──────────────────────────
   function addToCart(productId, qty = 1) {
     const product = getProduct(productId);
     if (!product) return;
     const existing = cart.find(i => i.id === productId);
-    if (existing) {
-      existing.qty += qty;
-    } else {
-      cart.push({ ...product, qty });
-    }
+    if (existing) { existing.qty += qty; }
+    else { cart.push({ ...product, qty }); }
     saveCart();
     updateCartBadge();
     if (typeof Auth !== 'undefined') Auth.showToast(`${product.name} added to cart! 🛒`);
@@ -68,21 +64,16 @@ const Orders = (() => {
 
   function removeFromCart(productId) {
     cart = cart.filter(i => i.id !== productId);
-    saveCart();
-    updateCartBadge();
-    renderCartItems();
+    saveCart(); updateCartBadge(); renderCartItems();
   }
 
   function updateQty(productId, delta) {
     const item = cart.find(i => i.id === productId);
     if (!item) return;
     item.qty = Math.max(1, item.qty + delta);
-    saveCart();
-    renderCartItems();
-    updateCartBadge();
+    saveCart(); renderCartItems(); updateCartBadge();
   }
 
-  // ── Cart Badge ─────────────────────────────────────
   function updateCartBadge() {
     const badge = document.getElementById('cart-badge');
     const count = getCartCount();
@@ -92,7 +83,6 @@ const Orders = (() => {
     }
   }
 
-  // ── Inject Cart Icon in Nav ────────────────────────
   function injectCartIcon() {
     const navRight = document.querySelector('.nav-right');
     if (!navRight) return;
@@ -117,7 +107,6 @@ const Orders = (() => {
     updateCartBadge();
   }
 
-  // ── Cart Drawer ────────────────────────────────────
   function injectCartDrawer() {
     const drawer = document.createElement('div');
     drawer.id = 'cart-drawer';
@@ -130,17 +119,12 @@ const Orders = (() => {
         </div>
         <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
-          <div class="cart-total-row">
-            <span>Subtotal</span>
-            <span id="cart-subtotal">₹0</span>
-          </div>
+          <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
           <div class="cart-total-row" style="font-size:1rem;color:rgba(245,239,224,0.5)">
-            <span>Shipping</span>
-            <span id="cart-shipping-val">₹49</span>
+            <span>Shipping</span><span id="cart-shipping-val">₹49</span>
           </div>
           <div class="cart-total-row" style="border-top:1px solid rgba(245,239,224,0.1);padding-top:0.75rem;margin-top:0.5rem;">
-            <span>Total</span>
-            <span id="cart-total-amount">₹0</span>
+            <span>Total</span><span id="cart-total-amount">₹0</span>
           </div>
           <p class="cart-shipping-note">Free shipping on orders above ₹499</p>
           <button class="cart-checkout-btn" id="cart-checkout">Proceed to Checkout</button>
@@ -149,31 +133,25 @@ const Orders = (() => {
     `;
     document.body.appendChild(drawer);
     document.getElementById('cart-overlay').onclick = closeCartDrawer;
-    document.getElementById('cart-close').onclick = closeCartDrawer;
+    document.getElementById('cart-close').onclick   = closeCartDrawer;
     document.getElementById('cart-checkout').onclick = handleCheckout;
   }
 
-  function openCartDrawer() {
-    renderCartItems();
-    document.getElementById('cart-drawer').classList.add('open');
-  }
-
-  function closeCartDrawer() {
-    document.getElementById('cart-drawer').classList.remove('open');
-  }
+  function openCartDrawer()  { renderCartItems(); document.getElementById('cart-drawer').classList.add('open'); }
+  function closeCartDrawer() { document.getElementById('cart-drawer').classList.remove('open'); }
 
   function renderCartItems() {
-    const container = document.getElementById('cart-items');
+    const container  = document.getElementById('cart-items');
     const subtotalEl = document.getElementById('cart-subtotal');
     const shippingEl = document.getElementById('cart-shipping-val');
-    const totalEl = document.getElementById('cart-total-amount');
+    const totalEl    = document.getElementById('cart-total-amount');
     if (!container) return;
 
     if (cart.length === 0) {
       container.innerHTML = '<p class="cart-empty">Your cart is empty.<br>Add some heat! 🌶️</p>';
       if (subtotalEl) subtotalEl.textContent = '₹0';
       if (shippingEl) shippingEl.textContent = '₹49';
-      if (totalEl) totalEl.textContent = '₹49';
+      if (totalEl)    totalEl.textContent    = '₹49';
       return;
     }
 
@@ -193,14 +171,13 @@ const Orders = (() => {
       </div>
     `).join('');
 
-    const sub = getCartTotal();
+    const sub  = getCartTotal();
     const ship = getShipping();
     if (subtotalEl) subtotalEl.textContent = `₹${sub}`;
     if (shippingEl) shippingEl.textContent = ship === 0 ? 'FREE' : `₹${ship}`;
-    if (totalEl) totalEl.textContent = `₹${sub + ship}`;
+    if (totalEl)    totalEl.textContent    = `₹${sub + ship}`;
   }
 
-  // ── Checkout ───────────────────────────────────────
   function handleCheckout() {
     if (typeof Auth !== 'undefined' && !Auth.getUser()) {
       closeCartDrawer();
@@ -216,7 +193,6 @@ const Orders = (() => {
     openCheckoutModal();
   }
 
-  // ── Checkout Modal ─────────────────────────────────
   function injectCheckoutModal() {
     const modal = document.createElement('div');
     modal.id = 'checkout-modal';
@@ -225,57 +201,32 @@ const Orders = (() => {
       <div class="checkout-box">
         <button class="checkout-close" id="checkout-close">&times;</button>
         <h2 class="checkout-title">Checkout</h2>
-        <p class="checkout-sub">Almost there — fill in your details below.</p>
+        <p class="checkout-sub">Fill in your delivery details below.</p>
 
         <div class="checkout-section-title">Delivery Address</div>
-        <div class="checkout-field">
-          <label>Full Name</label>
-          <input type="text" id="co-name" placeholder="Your full name" />
-        </div>
+        <div class="checkout-field"><label>Full Name</label><input type="text" id="co-name" placeholder="Full name"/></div>
         <div class="checkout-row">
-          <div class="checkout-field">
-            <label>Email</label>
-            <input type="email" id="co-email" placeholder="you@email.com" />
-          </div>
-          <div class="checkout-field">
-            <label>Phone</label>
-            <input type="tel" id="co-phone" placeholder="+91 XXXXX XXXXX" />
-          </div>
+          <div class="checkout-field"><label>Email</label><input type="email" id="co-email" placeholder="you@email.com"/></div>
+          <div class="checkout-field"><label>Phone</label><input type="tel" id="co-phone" placeholder="+91 XXXXX XXXXX"/></div>
         </div>
-        <div class="checkout-field">
-          <label>Address Line 1</label>
-          <input type="text" id="co-addr1" placeholder="House/Flat no., Building name" />
-        </div>
-        <div class="checkout-field">
-          <label>Address Line 2</label>
-          <input type="text" id="co-addr2" placeholder="Street, Area (optional)" />
-        </div>
+        <div class="checkout-field"><label>Address Line 1</label><input type="text" id="co-addr1" placeholder="House no., Building"/></div>
+        <div class="checkout-field"><label>Address Line 2</label><input type="text" id="co-addr2" placeholder="Street, Area (optional)"/></div>
         <div class="checkout-row">
-          <div class="checkout-field">
-            <label>City</label>
-            <input type="text" id="co-city" placeholder="City" />
-          </div>
-          <div class="checkout-field">
-            <label>PIN Code</label>
-            <input type="text" id="co-pin" placeholder="XXXXXX" maxlength="6" />
-          </div>
+          <div class="checkout-field"><label>City</label><input type="text" id="co-city" placeholder="City"/></div>
+          <div class="checkout-field"><label>PIN Code</label><input type="text" id="co-pin" placeholder="XXXXXX" maxlength="6"/></div>
         </div>
         <div class="checkout-field">
           <label>State</label>
           <select id="co-state">
             <option value="">Select state...</option>
-            <option>Assam</option><option>Andhra Pradesh</option>
-            <option>Bihar</option><option>Delhi</option>
-            <option>Goa</option><option>Gujarat</option>
-            <option>Haryana</option><option>Karnataka</option>
-            <option>Kerala</option><option>Madhya Pradesh</option>
-            <option>Maharashtra</option><option>Manipur</option>
-            <option>Meghalaya</option><option>Mizoram</option>
-            <option>Nagaland</option><option>Odisha</option>
-            <option>Punjab</option><option>Rajasthan</option>
-            <option>Sikkim</option><option>Tamil Nadu</option>
-            <option>Telangana</option><option>Tripura</option>
-            <option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>Assam</option><option>Andhra Pradesh</option><option>Bihar</option>
+            <option>Delhi</option><option>Goa</option><option>Gujarat</option>
+            <option>Haryana</option><option>Karnataka</option><option>Kerala</option>
+            <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+            <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+            <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+            <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+            <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
             <option>West Bengal</option>
           </select>
         </div>
@@ -285,33 +236,22 @@ const Orders = (() => {
           <div class="payment-option selected" data-method="cod">
             <div class="payment-radio-dot"></div>
             <div class="payment-icon">💵</div>
-            <div class="payment-info">
-              <div class="payment-label">Cash on Delivery</div>
-              <div class="payment-desc">Pay when your order arrives</div>
-            </div>
+            <div class="payment-info"><div class="payment-label">Cash on Delivery</div><div class="payment-desc">Pay when your order arrives</div></div>
           </div>
           <div class="payment-option" data-method="upi">
             <div class="payment-radio-dot"></div>
             <div class="payment-icon">📱</div>
-            <div class="payment-info">
-              <div class="payment-label">UPI</div>
-              <div class="payment-desc">Pay via Google Pay, PhonePe, Paytm & more</div>
-            </div>
+            <div class="payment-info"><div class="payment-label">UPI</div><div class="payment-desc">GPay, PhonePe, Paytm & more</div></div>
           </div>
           <div class="payment-option" data-method="netbanking">
             <div class="payment-radio-dot"></div>
             <div class="payment-icon">🏦</div>
-            <div class="payment-info">
-              <div class="payment-label">Net Banking</div>
-              <div class="payment-desc">All major Indian banks supported</div>
-            </div>
+            <div class="payment-info"><div class="payment-label">Net Banking</div><div class="payment-desc">All major Indian banks</div></div>
           </div>
         </div>
-
-        <!-- UPI ID field (shown when UPI selected) -->
         <div class="upi-field checkout-field" id="upi-field">
           <label>UPI ID</label>
-          <input type="text" id="co-upi" placeholder="yourname@upi" />
+          <input type="text" id="co-upi" placeholder="yourname@upi"/>
         </div>
 
         <div class="checkout-section-title">Order Summary</div>
@@ -322,36 +262,27 @@ const Orders = (() => {
       </div>
     `;
     document.body.appendChild(modal);
-
     document.getElementById('checkout-overlay').onclick = closeCheckoutModal;
-    document.getElementById('checkout-close').onclick = closeCheckoutModal;
-    document.getElementById('place-order-btn').onclick = placeOrder;
+    document.getElementById('checkout-close').onclick   = closeCheckoutModal;
+    document.getElementById('place-order-btn').onclick  = placeOrder;
 
-    // Payment option selection
     document.querySelectorAll('.payment-option').forEach(opt => {
       opt.addEventListener('click', () => {
         document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         const upiField = document.getElementById('upi-field');
-        if (upiField) {
-          upiField.classList.toggle('show', opt.dataset.method === 'upi');
-        }
+        if (upiField) upiField.classList.toggle('show', opt.dataset.method === 'upi');
       });
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeCheckoutModal();
     });
   }
 
   function openCheckoutModal() {
-    // Prefill user data
-    const user = Auth ? Auth.getUser() : null;
+    const user = typeof Auth !== 'undefined' ? Auth.getUser() : null;
     if (user) {
-      const nameEl = document.getElementById('co-name');
+      const nameEl  = document.getElementById('co-name');
       const emailEl = document.getElementById('co-email');
       const phoneEl = document.getElementById('co-phone');
-      if (nameEl && !nameEl.value) nameEl.value = user.name;
+      if (nameEl  && !nameEl.value)  nameEl.value  = user.name;
       if (emailEl && !emailEl.value) emailEl.value = user.email;
       if (phoneEl && !phoneEl.value && user.phone) phoneEl.value = user.phone;
     }
@@ -366,8 +297,7 @@ const Orders = (() => {
   function renderCheckoutSummary() {
     const el = document.getElementById('checkout-summary');
     if (!el) return;
-    const sub = getCartTotal();
-    const ship = getShipping();
+    const sub = getCartTotal(), ship = getShipping();
     el.innerHTML = `
       ${cart.map(item => `
         <div class="summary-item">
@@ -386,59 +316,83 @@ const Orders = (() => {
     `;
   }
 
-  function placeOrder() {
-    const name = (document.getElementById('co-name') || {}).value?.trim();
-    const email = (document.getElementById('co-email') || {}).value?.trim();
-    const phone = (document.getElementById('co-phone') || {}).value?.trim();
-    const addr1 = (document.getElementById('co-addr1') || {}).value?.trim();
-    const city = (document.getElementById('co-city') || {}).value?.trim();
-    const pin = (document.getElementById('co-pin') || {}).value?.trim();
-    const state = (document.getElementById('co-state') || {}).value;
+  // ── FIX 1: async function ──────────────────────────
+  // ── FIX 2: removed old localStorage order save ────
+  // ── FIX 3: defined paymentLabel before using it ───
+  async function placeOrder() {
+    const name  = document.getElementById('co-name')?.value.trim();
+    const email = document.getElementById('co-email')?.value.trim();
+    const phone = document.getElementById('co-phone')?.value.trim();
+    const addr1 = document.getElementById('co-addr1')?.value.trim();
+    const city  = document.getElementById('co-city')?.value.trim();
+    const pin   = document.getElementById('co-pin')?.value.trim();
+    const state = document.getElementById('co-state')?.value;
     const errEl = document.getElementById('checkout-error');
+    const btn   = document.getElementById('place-order-btn');
 
     const selectedPayment = document.querySelector('.payment-option.selected');
-    const paymentMethod = selectedPayment ? selectedPayment.dataset.method : 'cod';
+    const paymentMethod   = selectedPayment ? selectedPayment.dataset.method : 'cod';
+
+    // FIX 3: define paymentLabel here ✅
+    const paymentLabel = {
+      cod        : 'Cash on Delivery',
+      upi        : 'UPI',
+      netbanking : 'Net Banking'
+    }[paymentMethod];
 
     // Validation
-    if (!name) { errEl.textContent = 'Please enter your full name.'; return; }
+    if (!name)                                   { errEl.textContent = 'Please enter your full name.'; return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email.'; return; }
-    if (!phone || phone.length < 10) { errEl.textContent = 'Please enter a valid phone number.'; return; }
-    if (!addr1) { errEl.textContent = 'Please enter your address.'; return; }
-    if (!city) { errEl.textContent = 'Please enter your city.'; return; }
-    if (!pin || pin.length !== 6 || isNaN(pin)) { errEl.textContent = 'Please enter a valid 6-digit PIN code.'; return; }
-    if (!state) { errEl.textContent = 'Please select your state.'; return; }
+    if (!phone || phone.length < 10)             { errEl.textContent = 'Please enter a valid phone number.'; return; }
+    if (!addr1)                                  { errEl.textContent = 'Please enter your address.'; return; }
+    if (!city)                                   { errEl.textContent = 'Please enter your city.'; return; }
+    if (!pin || pin.length !== 6 || isNaN(pin))  { errEl.textContent = 'Please enter a valid 6-digit PIN code.'; return; }
+    if (!state)                                  { errEl.textContent = 'Please select your state.'; return; }
 
     if (paymentMethod === 'upi') {
-      const upiId = (document.getElementById('co-upi') || {}).value?.trim();
+      const upiId = document.getElementById('co-upi')?.value.trim();
       if (!upiId || !upiId.includes('@')) { errEl.textContent = 'Please enter a valid UPI ID.'; return; }
     }
 
     errEl.textContent = '';
+    btn.textContent   = 'Placing order…';
+    btn.disabled      = true;
 
-    // Save order
-    const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-    const order = {
-      id: 'VH' + Date.now(),
-      items: [...cart],
-      subtotal: getCartTotal(),
-      shipping: getShipping(),
-      total: getGrandTotal(),
-      paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'upi' ? 'UPI' : 'Net Banking',
-      address: { name, email, phone, addr1, city, pin, state },
-      date: new Date().toLocaleDateString('en-IN'),
-      status: paymentMethod === 'cod' ? 'Confirmed — Pay on Delivery' : 'Payment Pending',
-    };
-    orders.unshift(order);
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    try {
+      // FIX 2: save to Firebase only ✅
+      const orderId = await saveOrder({
+        userId        : Auth.getUser()?.email,
+        items         : cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, price: i.price, qty: i.qty })),
+        subtotal      : getCartTotal(),
+        shipping      : getShipping(),
+        total         : getGrandTotal(),
+        paymentMethod : paymentLabel,
+        address       : { name, email, phone, addr1, city, pin, state },
+        status        : paymentMethod === 'cod' ? 'Confirmed — Pay on Delivery' : 'Payment Pending',
+      });
 
-    // Clear cart
-    cart = [];
-    saveCart();
-    updateCartBadge();
-    closeCheckoutModal();
+      const order = {
+        id            : 'VH-' + orderId.substring(0, 6).toUpperCase(),
+        items         : [...cart],
+        shipping      : getShipping(),
+        total         : getGrandTotal(),
+        paymentMethod : paymentLabel,
+        address       : { name, email, phone, addr1, city, pin, state },
+      };
 
-    // Success screen
-    showOrderSuccess(order);
+      cart = [];
+      saveCart();
+      updateCartBadge();
+      closeCheckoutModal();
+      showOrderSuccess(order);
+
+    } catch (e) {
+      console.error('Order error:', e);
+      errEl.textContent = 'Failed to place order. Please try again.';
+    } finally {
+      btn.textContent = 'Place Order';
+      btn.disabled    = false;
+    }
   }
 
   function showOrderSuccess(order) {
@@ -493,17 +447,10 @@ const Orders = (() => {
     overlay.style.display = 'flex';
   }
 
-  // ── Wire Product Buttons ───────────────────────────
   function bindProductButtons() {
     document.querySelectorAll('.card-btn').forEach((btn, i) => {
-      const productId = `p${i + 1}`;
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        addToCart(productId);
-      };
+      btn.onclick = (e) => { e.stopPropagation(); addToCart(`p${i + 1}`); };
     });
-
-    // Click on product card → go to product detail
     document.querySelectorAll('.product-card').forEach((card, i) => {
       card.style.cursor = 'pointer';
       card.addEventListener('click', (e) => {
@@ -514,12 +461,10 @@ const Orders = (() => {
   }
 
   function goToProduct(productId) {
-    // Store in sessionStorage and load product page
     sessionStorage.setItem('vh_selected_product', productId);
     window.location.href = 'pages/product.html';
   }
 
-  // ── Init ───────────────────────────────────────────
   function init() {
     injectCartDrawer();
     injectCheckoutModal();
@@ -527,17 +472,9 @@ const Orders = (() => {
     bindProductButtons();
   }
 
-  return {
-    init,
-    addToCart,
-    removeFromCart,
-    updateQty,
-    getProduct,
-    getProducts: () => PRODUCTS,
-    goToProduct,
-    openCartDrawer,
-  };
+  return { init, addToCart, removeFromCart, updateQty, getProduct, getProducts: () => PRODUCTS, goToProduct, openCartDrawer };
 
 })();
 
 document.addEventListener('DOMContentLoaded', Orders.init);
+window.Orders = Orders;
